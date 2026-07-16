@@ -6,7 +6,7 @@ const ConversationModel = require('../database/models/conversation');
 const MessageModel = require('../database/models/message');
 const KnowledgeModel = require('../database/models/knowledge');
 const { syncKnowledgeBase, embedAndStore } = require('../services/embeddings');
-const { createAgent, registerPhoneNumber, updateAgentWebhook } = require('../services/retell');
+const { createAgent, registerPhoneNumber, updateAgentWebhook, createWebCall } = require('../services/retell');
 const { processMessage, finalizeConversation } = require('../services/rag');
 const fs = require('fs');
 const path = require('path');
@@ -48,8 +48,37 @@ router.post('/widget/chat', async (req, res) => {
       response: result.response
     });
   } catch (error) {
-    console.error('❌ Widget chat error:', error);
-    res.status(500).json({ error: error.message });
+    console.error('Chat error:', error);
+    res.status(500).json({ error: 'Failed to process message' });
+  }
+});
+
+// GET /api/widget/tts
+// Proxy to Google Translate unofficial TTS endpoint to get free voice audio
+router.get('/widget/tts', async (req, res) => {
+  const text = req.query.text;
+  if (!text) {
+    return res.status(400).json({ error: 'text parameter is required' });
+  }
+
+  try {
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(text)}`;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch TTS: ${response.statusText}`);
+    }
+
+    res.setHeader('Content-Type', 'audio/mpeg');
+    const { Readable } = require('stream');
+    Readable.fromWeb(response.body).pipe(res);
+  } catch (error) {
+    console.error('❌ TTS proxy error:', error.message);
+    res.status(500).json({ error: 'Failed to synthesize speech' });
   }
 });
 

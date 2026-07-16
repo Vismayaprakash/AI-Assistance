@@ -830,11 +830,24 @@ async function toggleSimCall() {
   startMockVoiceCall();
 }
 
+let audioCtx = null;
+let recDestination = null;
+let micSource = null;
+
 function startAudioRecording() {
   audioChunks = [];
   navigator.mediaDevices.getUserMedia({ audio: true })
     .then(stream => {
-      mediaRecorder = new MediaRecorder(stream);
+      // Initialize Web Audio Context
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      recDestination = audioCtx.createMediaStreamDestination();
+      
+      // Connect Microphone to Destination
+      micSource = audioCtx.createMediaStreamSource(stream);
+      micSource.connect(recDestination);
+      
+      // Record from the mixed audio destination stream
+      mediaRecorder = new MediaRecorder(recDestination.stream);
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) audioChunks.push(event.data);
       };
@@ -850,7 +863,19 @@ function stopAudioRecordingAndUpload(conversationId) {
 
   mediaRecorder.onstop = async () => {
     const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-    mediaRecorder.stream.getTracks().forEach(track => track.stop()); // Turn off mic light
+    
+    // Stop all microphone stream tracks
+    if (micSource && micSource.mediaStream) {
+      micSource.mediaStream.getTracks().forEach(track => track.stop());
+    }
+    
+    // Clean up AudioContext
+    if (audioCtx) {
+      audioCtx.close().catch(console.error);
+      audioCtx = null;
+      recDestination = null;
+      micSource = null;
+    }
 
     try {
       await fetch(`${getApiBase()}/widget/upload-recording?conversation_id=${conversationId}`, {
@@ -895,31 +920,87 @@ function startMockVoiceCall() {
 }
 
 function speakText(text, callback) {
-  if (!window.speechSynthesis) {
-    if (callback) callback();
+  appendSimTranscript(text, 'bot');
+  
+  // If Web Audio API is not initialized or failed, fallback to native SpeechSynthesis
+  if (!audioCtx || !recDestination) {
+    if (!window.speechSynthesis) {
+      if (callback) callback();
+      return;
+    }
+    
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    const selectedVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google')) ||
+                          voices.find(v => v.lang.startsWith('en')) ||
+                          voices[0];
+                          
+    if (selectedVoice) utterance.voice = selectedVoice;
+    
+    utterance.onend = () => {
+      if (callback) callback();
+    };
+    
+    utterance.onerror = (e) => {
+      console.error('Speech synthesis error:', e);
+      if (callback) callback();
+    };
+    
+    window.speechSynthesis.speak(utterance);
     return;
   }
-  
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  const voices = window.speechSynthesis.getVoices();
-  const selectedVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google')) ||
-                        voices.find(v => v.lang.startsWith('en')) ||
-                        voices[0];
-                        
-  if (selectedVoice) utterance.voice = selectedVoice;
-  
-  utterance.onend = () => {
+
+  // Speak via Proxy TTS and route into recording stream
+  try {
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    const audio = new Audio(`${getApiBase()}/widget/tts?text=${encodeURIComponent(text)}`);
+    audio.crossOrigin = 'anonymous';
+
+    const audioSource = audioCtx.createMediaElementSource(audio);
+    
+    // Connect to recorder stream AND to speakers
+    audioSource.connect(recDestination);
+    audioSource.connect(audioCtx.destination);
+
+    audio.onended = () => {
+      audioSource.disconnect();
+      if (callback) callback();
+    };
+
+    audio.onerror = (err) => {
+      console.warn('Proxy TTS failed, falling back to SpeechSynthesis:', err);
+      audioSource.disconnect();
+      // Fallback
+      if (window.speechSynthesis) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.onend = () => { if (callback) callback(); };
+        window.speechSynthesis.speak(utterance);
+      } else {
+        if (callback) callback();
+      }
+    };
+
+    audio.play().catch(err => {
+      console.warn('Audio play failed, falling back to SpeechSynthesis:', err);
+      audioSource.disconnect();
+      // Fallback
+      if (window.speechSynthesis) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.onend = () => { if (callback) callback(); };
+        window.speechSynthesis.speak(utterance);
+      } else {
+        if (callback) callback();
+      }
+    });
+
+  } catch (err) {
+    console.error('Error playing sound through Web Audio:', err);
     if (callback) callback();
-  };
-  
-  utterance.onerror = (e) => {
-    console.error('Speech synthesis error:', e);
-    if (callback) callback();
-  };
-  
-  appendSimTranscript(text, 'bot');
-  window.speechSynthesis.speak(utterance);
+  }
 }
 
 function appendSimTranscript(text, role) {

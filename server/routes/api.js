@@ -264,6 +264,17 @@ router.post('/business/:id/web-call', async (req, res) => {
     if (!agentId) {
       const agent = await createAgent(business);
       agentId = agent.agent_id;
+    } else {
+      // Proactively update the agent's WebSocket URL in case the ngrok URL has changed
+      if (config.retellApiKey && config.ngrokUrl) {
+        try {
+          const wsUrl = `${config.ngrokUrl.replace(/^http/, 'ws')}/api/retell/llm-websocket`;
+          console.log(`🔄 Syncing Retell agent ${agentId} with fresh ngrok WebSocket URL: ${wsUrl}`);
+          await updateAgentWebhook(agentId, wsUrl);
+        } catch (err) {
+          console.warn('⚠️ Failed to sync Retell Agent webhook on web-call:', err.message);
+        }
+      }
     }
 
     const webCall = await createWebCall(agentId);

@@ -101,12 +101,35 @@ router.post('/webhook', async (req, res) => {
 async function handleRetellLLMWebSocket(ws, req) {
   console.log('🔌 Retell LLM WebSocket connected');
 
+  // Extract call ID from request URL path
+  const pathname = req.url.split('?')[0]; // Strip query parameters
+  const pathParts = pathname.split('/');
+  const callId = pathParts[pathParts.length - 1];
+
   let businessId = null;
   let conversationHistory = [];
+
+  console.log(`🔌 Call ID from WebSocket path: ${callId}`);
+
+  // Fetch business ID from database by Retell Call ID
+  if (callId && callId.startsWith('call_')) {
+    const convo = ConversationModel.getByRetellCallId(callId);
+    if (convo) {
+      businessId = convo.business_id;
+      const business = BusinessModel.getById(businessId);
+      console.log(`🧠 Found business for call ${callId}: ${business ? business.name : 'Unknown'}`);
+    } else {
+      console.warn(`⚠️ No conversation found in DB for Retell Call ID: ${callId}`);
+    }
+  }
 
   ws.on('message', async (data) => {
     try {
       const message = JSON.parse(data.toString());
+      console.log(`✉️ Retell WS message: ${message.interaction_type}`);
+      if (message.interaction_type === 'call_details') {
+        console.log('Metadata agent_id:', message.call?.agent_id);
+      }
 
       switch (message.interaction_type) {
         case 'call_details': {
@@ -166,6 +189,34 @@ async function handleRetellLLMWebSocket(ws, req) {
             end_call: false
           }));
 
+          // Save transcript in real-time to avoid dependency on webhook
+          if (callId) {
+            const convo = ConversationModel.getByRetellCallId(callId);
+            if (convo) {
+              const fullMessages = conversationHistory.map(m => ({
+                conversation_id: convo.id,
+                role: m.role,
+                content: m.content
+              }));
+              // Append assistant response we just sent
+              fullMessages.push({
+                conversation_id: convo.id,
+                role: 'assistant',
+                content: result.response
+              });
+
+              // Overwrite current messages in DB with the updated full transcript
+              MessageModel.deleteForConversation(convo.id);
+              MessageModel.createBulk(fullMessages);
+
+              // Update duration in real-time
+              const elapsedSeconds = Math.round((Date.now() - new Date(convo.started_at + 'Z').getTime()) / 1000);
+              if (elapsedSeconds > 0) {
+                ConversationModel.updateDuration(convo.id, elapsedSeconds);
+              }
+            }
+          }
+
           break;
         }
 
@@ -188,13 +239,57 @@ async function handleRetellLLMWebSocket(ws, req) {
     }
   });
 
-  ws.on('close', () => {
+  ws.on('close', async () => {
     console.log('🔌 Retell LLM WebSocket disconnected');
+    if (callId) {
+      try {
+        const convo = ConversationModel.getByRetellCallId(callId);
+        if (convo) {
+          console.log(`🏁 Finalizing conversation ${convo.id} on WebSocket close...`);
+          await finalizeConversation(convo.id);
+          
+          // Trigger polling to fetch the official recording URL from Retell API
+          setTimeout(() => syncRetellCallData(callId), 5000);
+        }
+      } catch (err) {
+        console.error('❌ Failed to finalize conversation on WS close:', err.message);
+      }
+    }
   });
 
   ws.on('error', (error) => {
     console.error('❌ LLM WebSocket error:', error);
   });
+}
+
+/**
+ * Sync call details (recording URL and duration) directly from Retell's API as a webhook backup
+ */
+async function syncRetellCallData(callId, attemptsLeft = 3) {
+  try {
+    console.log(`🔍 Syncing Retell call details for ${callId} (attempts left: ${attemptsLeft})...`);
+    const details = await getCallDetails(callId);
+    if (!details) return;
+
+    const convo = ConversationModel.getByRetellCallId(callId);
+    if (!convo) return;
+
+    if (details.recording_url) {
+      console.log(`💾 Retell recording URL found: ${details.recording_url}`);
+      ConversationModel.updateRecordingUrl(convo.id, details.recording_url);
+    }
+
+    if (details.duration_ms) {
+      ConversationModel.updateDuration(convo.id, Math.round(details.duration_ms / 1000));
+    }
+
+    // If recording URL is still missing, retry in 5 seconds
+    if (!details.recording_url && attemptsLeft > 1) {
+      setTimeout(() => syncRetellCallData(callId, attemptsLeft - 1), 5000);
+    }
+  } catch (err) {
+    console.error('❌ Error syncing Retell call data:', err.message);
+  }
 }
 
 module.exports = { router, handleRetellLLMWebSocket };

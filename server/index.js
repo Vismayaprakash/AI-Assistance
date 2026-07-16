@@ -59,12 +59,14 @@ const wss = new WebSocketServer({ noServer: true });
 
 server.on('upgrade', (request, socket, head) => {
   const pathname = new URL(request.url, `http://${request.headers.host}`).pathname;
+  console.log(`🔌 Incoming WebSocket Upgrade Request for path: ${pathname}`);
 
-  if (pathname === '/api/retell/llm-websocket') {
+  if (pathname.startsWith('/api/retell/llm-websocket')) {
     wss.handleUpgrade(request, socket, head, (ws) => {
       handleRetellLLMWebSocket(ws, request);
     });
   } else {
+    console.log(`❌ Rejecting upgrade for path: ${pathname}`);
     socket.destroy();
   }
 });

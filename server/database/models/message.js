@@ -37,6 +37,14 @@ const MessageModel = {
   },
 
   /**
+   * Delete messages for a conversation
+   */
+  deleteForConversation(conversationId) {
+    const db = getDb();
+    db.prepare('DELETE FROM messages WHERE conversation_id = ?').run(conversationId);
+  },
+
+  /**
    * Get message by ID
    */
   getById(id) {

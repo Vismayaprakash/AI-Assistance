@@ -39,7 +39,7 @@ async function createAgent(business) {
       backchannel_frequency: 0.8,
       ambient_sound: null,
       responsiveness: 0.8,
-      interruption_sensitivity: 0.6,
+      interruption_sensitivity: 1.0,
       reminder_trigger_ms: 10000, // Remind after 10s of silence
       reminder_max_count: 2,
       end_call_after_silence_ms: 30000, // End call after 30s silence
@@ -88,7 +88,8 @@ async function updateAgentWebhook(agentId, webhookUrl) {
       response_engine: {
         type: 'custom-llm',
         llm_websocket_url: webhookUrl,
-      }
+      },
+      interruption_sensitivity: 1.0,
     });
 
     console.log(`✅ Updated agent ${agentId} with custom LLM WebSocket URL: ${webhookUrl}`);

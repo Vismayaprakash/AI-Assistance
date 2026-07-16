@@ -756,6 +756,7 @@ async function toggleSimCall() {
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
+    isAiSpeaking = false;
     if (simSilenceTimer) {
       clearTimeout(simSilenceTimer);
       simSilenceTimer = null;
@@ -901,6 +902,8 @@ function startMockVoiceCall() {
   });
 }
 
+let isAiSpeaking = false;
+
 function speakText(text, callback) {
   appendSimTranscript(text, 'bot');
   
@@ -919,14 +922,17 @@ function speakText(text, callback) {
   if (selectedVoice) utterance.voice = selectedVoice;
   
   utterance.onend = () => {
+    isAiSpeaking = false;
     if (callback) callback();
   };
   
   utterance.onerror = (e) => {
     console.error('Speech synthesis error:', e);
+    isAiSpeaking = false;
     if (callback) callback();
   };
   
+  isAiSpeaking = true;
   window.speechSynthesis.speak(utterance);
 }
 
@@ -966,13 +972,6 @@ function startListening() {
   const triggerAIResponse = async (text) => {
     if (!text.trim()) return;
     
-    // Stop recognition to prevent recording response speech
-    if (simRecognition) {
-      try {
-        simRecognition.stop();
-      } catch(e) {}
-    }
-    
     // Finalize the transcript UI bubble
     if (simInterimBubble) {
       simInterimBubble.textContent = `👤 ${text}`;
@@ -997,14 +996,14 @@ function startListening() {
       if (response && response.response) {
         status.textContent = 'Speaking... 🔊';
         speakText(response.response, () => {
-          startListening();
+          status.textContent = 'Listening... 🎙️';
         });
       }
     } catch (err) {
       console.error(err);
       status.textContent = 'Error processing speech';
       speakText("I'm sorry, I encountered an error. Can you repeat that?", () => {
-        startListening();
+        status.textContent = 'Listening... 🎙️';
       });
     }
   };
@@ -1022,6 +1021,26 @@ function startListening() {
     
     const currentText = (simFinalTranscript + interimText).trim();
     if (currentText) {
+      // Voice interruption trigger while AI is speaking
+      if (isAiSpeaking) {
+        console.log('⚡ Interruption detected! Stopping speech synthesis.');
+        window.speechSynthesis.cancel();
+        isAiSpeaking = false;
+        if (simSilenceTimer) clearTimeout(simSilenceTimer);
+        
+        // Finalize speech bubble immediately
+        if (simInterimBubble) {
+          simInterimBubble.textContent = `👤 ${currentText}`;
+          simInterimBubble.classList.remove('interim');
+          simInterimBubble = null;
+        } else {
+          appendSimTranscript(currentText, 'user');
+        }
+        
+        triggerAIResponse(currentText);
+        return;
+      }
+
       // Create/update real-time speech bubble
       const container = document.getElementById('simTranscript');
       if (!simInterimBubble) {
@@ -1047,9 +1066,11 @@ function startListening() {
   };
   
   simRecognition.onend = () => {
-    // If ended naturally without trigger, and still calling, restart
-    if (isSimCalling && status.textContent === 'Listening... 🎙️') {
-      startListening();
+    // If still in calling mode, always keep restart/active
+    if (isSimCalling) {
+      try {
+        simRecognition.start();
+      } catch(e) {}
     }
   };
   

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — AI Receptionist</title>
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-card">
+      <div class="brand">
+        <div class="logo">🤖</div>
+        <h1>AI Receptionist</h1>
+        <p>Sign in to your dashboard</p>
+      </div>
+
+      <div class="login-error" id="loginError"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" class="form-control" placeholder="Enter username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" class="form-control" placeholder="Enter password" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:0.85rem;" id="loginBtn">
+          Sign In
+        </button>
+      </form>
+      <a href="#" onclick="promptBackendUrl()" style="display:block; text-align:center; margin-top:1.25rem; font-size:0.75rem; color:var(--text-muted); text-decoration:none;">⚙️ Connection Settings</a>
+    </div>
+  </div>
+
+  <script>
+    function promptBackendUrl() {
+      const current = localStorage.getItem('backend_url') || 'https://levitator-quickstep-unfocused.ngrok-free.dev';
+      const newUrl = prompt('Enter your current ngrok Backend Server URL:', current);
+      if (newUrl !== null) {
+        if (newUrl.trim()) {
+          localStorage.setItem('backend_url', newUrl.trim());
+        } else {
+          localStorage.removeItem('backend_url');
+        }
+        alert('Server URL updated! Page will reload.');
+        window.location.reload();
+      }
+    }
+
+    // Redirect if already logged in
+    if (localStorage.getItem('token')) {
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const errorEl = document.getElementById('loginError');
+      errorEl.style.display = 'none';
+      btn.innerHTML = '<span class="loading-spinner"></span> Signing in...';
+      btn.disabled = true;
+
+      const getApiBase = () => {
+        const customUrl = localStorage.getItem('backend_url');
+        return customUrl ? `${customUrl.replace(/\/$/, '')}/api` : 'https://levitator-quickstep-unfocused.ngrok-free.dev/api';
+      };
+
+      try {
+        const res = await fetch(`${getApiBase()}/auth/login`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true'
+          },
+          body: JSON.stringify({
+            username: document.getElementById('username').value.trim(),
+            password: document.getElementById('password').value.trim()
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Login failed');
+
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        window.location.href = 'index.html';
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.style.display = 'block';
+        btn.innerHTML = 'Sign In';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

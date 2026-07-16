@@ -1,0 +1,16 @@
+{
+  "name": "ai-support-copilot",
+  "version": "1.0.0",
+  "description": "Silent AI support assistant that transcribes speech and provides real-time RAG suggestions.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.11.0",
+    "better-sqlite3": "^11.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}

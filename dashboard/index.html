@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — AI Receptionist</title>
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="logo">🤖</span>
+        <div>
+          <h1>AI Receptionist</h1>
+          <span id="businessNameSidebar">Dashboard</span>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#overview" class="nav-item active" data-page="overview">
+          <span class="icon">📊</span> Overview
+        </a>
+        <a href="#conversations" class="nav-item" data-page="conversations">
+          <span class="icon">📞</span> Conversations
+        </a>
+        <a href="#knowledge" class="nav-item" data-page="knowledge">
+          <span class="icon">📚</span> Knowledge Base
+        </a>
+        <a href="#settings" class="nav-item" data-page="settings">
+          <span class="icon">⚙️</span> Settings
+        </a>
+        <a href="#simulator" class="nav-item" data-page="simulator">
+          <span class="icon">🔊</span> Voice Simulator
+        </a>
+      </nav>
+      <div class="sidebar-footer" style="display:flex; flex-direction:column; gap:0.25rem;">
+        <a href="#" onclick="promptBackendUrl()" class="nav-item" style="font-size:0.8rem; text-decoration:none;">
+          <span class="icon">⚙️</span> API Connection
+        </a>
+        <button class="nav-item logout" onclick="logout()">
+          <span class="icon">🚪</span> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- OVERVIEW PAGE -->
+      <div id="page-overview" class="page-section">
+        <div class="page-header">
+          <h2>📊 Overview</h2>
+          <p>Your AI receptionist at a glance</p>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card blue">
+            <div class="stat-icon">📞</div>
+            <div class="stat-value" id="statTotal">-</div>
+            <div class="stat-label">Total Conversations</div>
+          </div>
+          <div class="stat-card teal">
+            <div class="stat-icon">📅</div>
+            <div class="stat-value" id="statToday">-</div>
+            <div class="stat-label">Today</div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-icon">⏱️</div>
+            <div class="stat-value" id="statDuration">-</div>
+            <div class="stat-label">Avg Duration</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-value" id="statPending">-</div>
+            <div class="stat-label">Pending Reviews</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex-between mb-2">
+            <h3>Recent Conversations</h3>
+            <a href="#conversations" class="btn btn-outline btn-sm">View All</a>
+          </div>
+          <div id="recentConversations">
+            <div class="empty-state">
+              <div class="icon">📞</div>
+              <h3>No conversations yet</h3>
+              <p>Once your AI receptionist starts taking calls, they'll appear here.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Business Setup Section -->
+        <div class="card mt-3" id="setupCard">
+          <h3 class="mb-2">🚀 Quick Setup</h3>
+          <div id="businessSetup">
+            <p class="text-muted mb-2">Get started by creating a business profile:</p>
+            <div class="form-group">
+              <label>Business Name</label>
+              <input type="text" id="quickBizName" class="form-control" placeholder="e.g., Smile Dental Clinic">
+            </div>
+            <div class="form-group">
+              <label>Business Type</label>
+              <select id="quickBizType" class="form-control">
+                <option value="dental">🦷 Dental Clinic</option>
+                <option value="salon">💇 Salon & Spa</option>
+                <option value="general">🏢 General Business</option>
+              </select>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="quickSetupBusiness()">Create Business</button>
+            </div>
+          </div>
+          <div id="businessCreated" class="hidden">
+            <p style="color: var(--accent-green);">✅ Business created! Go to <a href="#knowledge">Knowledge Base</a> to import a template, then <a href="#settings">Settings</a> to configure your AI.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONVERSATIONS PAGE -->
+      <div id="page-conversations" class="page-section hidden">
+        <div class="page-header">
+          <h2>📞 Conversations</h2>
+          <p>Review and improve AI responses</p>
+        </div>
+
+        <div class="filter-bar">
+          <button class="filter-chip active" data-filter="all" onclick="filterConversations('all', this)">All</button>
+          <button class="filter-chip" data-filter="call" onclick="filterConversations('call', this)">📞 Calls</button>
+          <button class="filter-chip" data-filter="web" onclick="filterConversations('web', this)">💬 Web</button>
+          <button class="filter-chip" data-filter="completed" onclick="filterConversations('completed', this)">✅ Completed</button>
+          <button class="filter-chip" data-filter="active" onclick="filterConversations('active', this)">🟢 Active</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Channel</th>
+                <th>Caller</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="conversationsTable">
+              <tr><td colspan="6" class="text-center text-muted" style="padding:2rem;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- KNOWLEDGE BASE PAGE -->
+      <div id="page-knowledge" class="page-section hidden">
+        <div class="page-header flex-between">
+          <div>
+            <h2>📚 Knowledge Base</h2>
+            <p>Manage what your AI knows</p>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-teal" onclick="openImportModal()">📥 Import Template</button>
+            <button class="btn btn-primary" onclick="openAddKnowledgeModal()">+ Add Entry</button>
+            <button class="btn btn-outline" onclick="syncKnowledge()">🔄 Sync to AI</button>
+          </div>
+        </div>
+
+        <div class="filter-bar" id="categoryFilters"></div>
+
+        <div class="knowledge-grid" id="knowledgeGrid">
+          <div class="empty-state" style="grid-column:1/-1">
+            <div class="icon">📚</div>
+            <h3>No knowledge entries yet</h3>
+            <p>Import a template or add entries manually to teach your AI about your business.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS PAGE -->
+      <div id="page-settings" class="page-section hidden">
+        <div class="page-header">
+          <h2>⚙️ Settings</h2>
+          <p>Configure your business and AI</p>
+        </div>
+
+        <div class="card mb-2">
+          <h3 class="mb-2">Business Information</h3>
+          <div class="form-group">
+            <label>Business Name</label>
+            <input type="text" id="setName" class="form-control">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div class="form-group">
+              <label>Type</label>
+              <select id="setType" class="form-control">
+                <option value="dental">🦷 Dental Clinic</option>
+                <option value="salon">💇 Salon & Spa</option>
+                <option value="general">🏢 General</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="text" id="setPhone" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="setEmail" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Address</label>
+            <input type="text" id="setAddress" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="setDescription" class="form-control" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="card mb-2">
+          <h3 class="mb-2">🤖 AI Configuration</h3>
+          <div class="form-group">
+            <label>Greeting Message (what AI says when picking up the call)</label>
+            <textarea id="setGreeting" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label>AI Personality</label>
+            <textarea id="setPersonality" class="form-control" rows="2" placeholder="e.g., professional, warm, reassuring"></textarea>
+          </div>
+        </div>
+
+        <div class="card mb-2">
+          <h3 class="mb-2">📞 Phone Number</h3>
+          <div id="phoneInfo">
+            <p class="text-muted">No phone number configured yet.</p>
+            <div class="flex gap-sm mt-1" style="flex-wrap: wrap; align-items: center;">
+              <button class="btn btn-primary" onclick="setupPhone()">Option A: Auto-Buy Number</button>
+              <span class="text-muted">or</span>
+              <div style="display: flex; gap: 0.5rem; flex: 1; min-width: 250px; align-items: center;">
+                <input type="text" id="manualPhoneInput" class="form-control" placeholder="e.g., +1234567890" style="margin-bottom: 0;">
+                <button class="btn btn-secondary" onclick="linkManualPhone()" style="white-space: nowrap;">Option B: Link Existing Number</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveSettings()" style="padding:0.85rem 2rem;">💾 Save Settings</button>
+      </div>
+
+      <!-- VOICE SIMULATOR PAGE -->
+      <div id="page-simulator" class="page-section hidden">
+        <div class="page-header">
+          <h2>🔊 Voice Receptionist Simulator</h2>
+          <p>Test the receptionist voice call experience directly from your browser</p>
+        </div>
+
+        <div class="card" style="max-width: 480px; margin: 1.5rem auto; padding: 2rem;">
+          <div class="simulator-phone">
+            <div class="phone-screen">
+              <div class="phone-avatar" id="simAvatar">🤖</div>
+              <h3 class="phone-name" id="simBizName">AI Receptionist</h3>
+              <p class="phone-status" id="simStatus">Ready to Call</p>
+              
+              <div class="transcript-display hidden" id="simTranscript"></div>
+            </div>
+            
+            <div class="phone-controls">
+              <button class="btn btn-primary btn-round" id="simCallBtn" onclick="toggleSimCall()">
+                📞 Start Voice Call
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: View Conversation -->
+  <div class="modal-overlay" id="conversationModal">
+    <div class="modal" style="max-width:700px;">
+      <div class="modal-header">
+        <h3>📞 Conversation Transcript</h3>
+        <button class="modal-close" onclick="closeModal('conversationModal')">&times;</button>
+      </div>
+      <div class="flex-between mb-2 text-sm text-muted">
+        <span id="modalConvInfo"></span>
+        <span id="modalConvDuration"></span>
+      </div>
+      <div id="modalAudioPlayerContainer" style="margin-bottom: 1rem; display: none;">
+        <audio id="modalAudioPlayer" controls style="width: 100%; border-radius: 8px;"></audio>
+      </div>
+      <div class="transcript" id="modalTranscript"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: Add Knowledge Entry -->
+  <div class="modal-overlay" id="addKnowledgeModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>📝 Add Knowledge Entry</h3>
+        <button class="modal-close" onclick="closeModal('addKnowledgeModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="kbTitle" class="form-control" placeholder="e.g., Teeth Whitening Service">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="kbCategory" class="form-control">
+          <option value="FAQ">FAQ</option>
+          <option value="services">Services</option>
+          <option value="pricing">Pricing</option>
+          <option value="booking">Booking</option>
+          <option value="general">General</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Content</label>
+        <textarea id="kbContent" class="form-control" rows="5" placeholder="Describe this knowledge entry..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="addKnowledgeEntry()">Add Entry</button>
+    </div>
+  </div>
+
+  <!-- MODAL: Import Template -->
+  <div class="modal-overlay" id="importModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>📥 Import Template</h3>
+        <button class="modal-close" onclick="closeModal('importModal')">&times;</button>
+      </div>
+      <p class="text-muted mb-2">Choose a pre-built knowledge base template:</p>
+      <div style="display:grid;gap:1rem;">
+        <div class="card" style="cursor:pointer;" onclick="importTemplate('dental-clinic')">
+          <div class="flex gap-sm" style="align-items:center;">
+            <span style="font-size:2rem;">🦷</span>
+            <div>
+              <strong>Dental Clinic</strong>
+              <p class="text-sm text-muted">15 entries: FAQ, services, booking, pricing</p>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="cursor:pointer;" onclick="importTemplate('salon')">
+          <div class="flex gap-sm" style="align-items:center;">
+            <span style="font-size:2rem;">💇</span>
+            <div>
+              <strong>Salon & Spa</strong>
+              <p class="text-sm text-muted">15 entries: FAQ, services, booking, pricing</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Review Response -->
+  <div class="modal-overlay" id="reviewModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>✏️ Correct Response</h3>
+        <button class="modal-close" onclick="closeModal('reviewModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>Original AI Response</label>
+        <div class="card text-sm" id="reviewOriginal" style="color:var(--text-secondary);"></div>
+      </div>
+      <div class="form-group">
+        <label>Corrected Response</label>
+        <textarea id="reviewCorrected" class="form-control" rows="4" placeholder="What should the AI have said?"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Notes (optional)</label>
+        <input type="text" id="reviewNotes" class="form-control" placeholder="Why is this correction needed?">
+      </div>
+      <input type="hidden" id="reviewMessageId">
+      <input type="hidden" id="reviewConvId">
+      <button class="btn btn-primary" onclick="submitCorrection()">Submit Correction</button>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="js/dashboard.js?v=2"></script>
+</body>
+</html>

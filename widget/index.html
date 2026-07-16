@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Assistant</title>
+  <link rel="stylesheet" href="widget.css">
+</head>
+<body>
+  <div class="chat-container">
+    <!-- Chat Header -->
+    <header class="chat-header">
+      <div class="avatar-container">
+        <div class="avatar">🤖</div>
+        <span class="online-indicator"></span>
+      </div>
+      <div class="header-info">
+        <h3 id="assistantName">AI Receptionist</h3>
+        <p id="assistantStatus">Online • Ready to help</p>
+      </div>
+      <button class="close-btn" id="closeWidgetBtn" title="Close chat">&times;</button>
+    </header>
+
+    <!-- Chat Messages -->
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg-bubble system">
+        <div class="msg-content">Welcome! Let me know if you have any questions.</div>
+      </div>
+    </div>
+
+    <!-- Typing Indicator -->
+    <div class="typing-indicator hidden" id="typingIndicator">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+
+    <!-- Chat Input -->
+    <form class="chat-input-area" id="chatInputForm">
+      <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off" required>
+      <button type="submit" class="send-btn" id="sendBtn" title="Send message">
+        <svg viewBox="0 0 24 24" width="20" height="20">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"></path>
+        </svg>
+      </button>
+    </form>
+  </div>
+
+  <script src="widget.js"></script>
+</body>
+</html>

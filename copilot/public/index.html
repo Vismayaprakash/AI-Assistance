@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Support Copilot — Agent Assist</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="logo-block">
+        <span class="icon">🎧</span>
+        <div>
+          <h1>AI Support Copilot</h1>
+          <p class="tagline">Agent Assist & Live RAG Workspace</p>
+        </div>
+      </div>
+      <div class="status-indicator" style="display: flex; gap: 0.5rem; align-items: center; padding: 0.35rem 1rem;">
+        <span class="dot" id="apiStatusDot"></span>
+        <span id="apiStatusText" style="margin-right: 0.5rem;">Connecting...</span>
+        <input type="text" id="backendUrlInput" onchange="saveBackendUrl(this.value)" placeholder="Enter Backend URL (e.g. http://localhost:3500)" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.75rem; width: 230px; outline: none; transition: var(--transition);">
+      </div>
+    </header>
+
+    <!-- WORKSPACE -->
+    <main class="workspace-grid">
+      <!-- LEFT COLUMN: LIVE TRANSCRIBER -->
+      <section class="workspace-card live-card">
+        <div class="card-header">
+          <h2>🎙️ Live Assistant Session</h2>
+          <span class="badge" id="sessionBadge">Offline</span>
+        </div>
+
+        <div class="waveform-container" id="waveform">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+
+        <div class="transcript-box">
+          <h3>Running Transcript</h3>
+          <div class="transcript-content" id="transcript">
+            <p class="placeholder-text">Click "Start Assist Session" and begin speaking. The AI will listen and transcribe here.</p>
+          </div>
+        </div>
+
+        <div class="control-actions">
+          <button class="btn btn-primary btn-large" id="startBtn" onclick="startSession()">
+            🎙️ Start Assist Session
+          </button>
+          <button class="btn btn-danger btn-large hidden" id="endBtn" onclick="endSession()">
+            🛑 End Assist Session
+          </button>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: SMART ASSIST CARDS -->
+      <section class="workspace-card assist-card">
+        <div class="card-header">
+          <h2>💡 Copilot Recommendations</h2>
+        </div>
+
+        <!-- RAG RECOMMENDATIONS -->
+        <div class="assist-section">
+          <h3>Real-Time Suggested Answers</h3>
+          <div class="suggestions-list" id="suggestions">
+            <p class="placeholder-text">AI suggested answers will pop up here in real-time as you discuss pricing, hours, or services with the caller.</p>
+          </div>
+        </div>
+
+        <!-- POST-CALL AUTO-LEARN PANEL (HIDDEN BY DEFAULT) -->
+        <div class="assist-section hidden" id="analysisSection">
+          <h3>🧠 Post-Call Auto-Learn Analysis</h3>
+          <div class="analysis-box">
+            <div class="summary-block mb-3">
+              <strong>Conversation Summary:</strong>
+              <p id="analysisSummary" class="text-sm mt-1">-</p>
+            </div>
+            
+            <div class="gaps-block">
+              <strong>Detected Knowledge Gaps & Suggestions:</strong>
+              <p class="text-xs text-muted mb-2">The AI identified these questions as missing or incomplete in your knowledge base. Click "Add to KB" to teach the AI.</p>
+              <div class="gaps-list" id="analysisGaps">
+                <p class="placeholder-text">No gaps detected yet.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

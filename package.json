@@ -1,0 +1,33 @@
+{
+  "name": "ai-receptionist",
+  "version": "1.0.0",
+  "description": "AI Receptionist - RAG-powered 24/7 voice and text assistant for businesses",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "keywords": [
+    "ai",
+    "receptionist",
+    "rag",
+    "voice",
+    "chatbot"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.7.0",
+    "chromadb": "^1.9.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "express": "^4.21.0",
+    "groq-sdk": "^1.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "retell-sdk": "^4.0.0",
+    "socket.io": "^4.8.0",
+    "uuid": "^11.0.0",
+    "ws": "^8.18.0"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "template": "salon",
+  "name": "Beauty Salon & Spa",
+  "description": "Pre-built knowledge base for beauty salons, hair salons, and spas",
+  "defaults": {
+    "greeting_message": "Hey there! Thanks for calling our salon! How can I help you today?",
+    "ai_personality": "friendly, trendy, enthusiastic, and welcoming — make callers feel excited about their upcoming visit"
+  },
+  "entries": [
+    {
+      "title": "Walk-ins and Appointments",
+      "content": "We welcome walk-ins based on availability, but we highly recommend booking an appointment to guarantee your preferred stylist and time slot. You can book by calling us, or through our website. Appointments help us ensure we have enough time dedicated just for you. Same-day appointments are often available if you call early!",
+      "category": "FAQ"
+    },
+    {
+      "title": "Cancellation Policy",
+      "content": "We ask for at least 24 hours notice for cancellations or rescheduling. This helps us manage our schedule and offer the slot to other clients. Late cancellations or no-shows may be subject to a cancellation fee of 50% of the service price. We totally understand that things come up — just give us a heads up!",
+      "category": "FAQ"
+    },
+    {
+      "title": "What to Know Before Your Visit",
+      "content": "For hair color appointments, please arrive with clean, dry hair and avoid using heavy styling products. For spa treatments, arrive 10-15 minutes early to relax before your service. Wear comfortable clothing for spa visits. For nail services, avoid applying lotion to your hands before your appointment for better polish adhesion.",
+      "category": "FAQ"
+    },
+    {
+      "title": "Products We Use and Sell",
+      "content": "We use and retail professional-grade products from top brands. Our stylists can recommend the perfect products for your hair type and concerns during your appointment. We offer shampoos, conditioners, styling products, treatments, and tools. Ask your stylist about our product recommendations for at-home care!",
+      "category": "FAQ"
+    },
+    {
+      "title": "Gift Cards",
+      "content": "We offer gift cards in any amount — perfect for birthdays, holidays, or just because! Gift cards can be purchased in-salon or sometimes through our website. They never expire and can be used for any service or product. They make a great gift for someone who deserves a little pampering!",
+      "category": "FAQ"
+    },
+    {
+      "title": "Haircut Services",
+      "content": "Our haircut services include a consultation, shampoo, precision cut, and blowout styling. Women's haircuts typically take 45-60 minutes. Men's haircuts take about 30 minutes. Children's haircuts are available for kids 12 and under. All cuts include styling tips from your stylist so you can recreate the look at home.",
+      "category": "services"
+    },
+    {
+      "title": "Hair Coloring",
+      "content": "We offer a full range of coloring services including single process color, highlights, balayage, ombre, color corrections, and fashion colors. A color consultation is always included to find your perfect shade. Processing time varies — single color takes about 1.5-2 hours, while highlights or balayage may take 2-3 hours.",
+      "category": "services"
+    },
+    {
+      "title": "Hair Treatments",
+      "content": "Treat your hair to some extra love! We offer deep conditioning treatments, keratin smoothing treatments, bond repair treatments, and scalp treatments. Treatments can be added to any appointment or booked as standalone services. They take 15-45 minutes depending on the treatment and leave your hair feeling amazing.",
+      "category": "services"
+    },
+    {
+      "title": "Styling and Blowouts",
+      "content": "Need to look fabulous for an event? Our blowout and styling services include shampoo, conditioning, and a gorgeous styled finish — curls, waves, straight, or an updo. Blowouts take about 30-45 minutes. Updos and special event styling take 45-90 minutes. We also offer bridal and group styling packages.",
+      "category": "services"
+    },
+    {
+      "title": "Nail Services",
+      "content": "Our nail services include classic manicures, gel manicures, classic pedicures, spa pedicures, nail art, and nail extensions (acrylics, gel tips, dip powder). A classic manicure takes about 30 minutes, while a spa pedicure takes about 45-60 minutes. We use sanitized tools and premium products for every client.",
+      "category": "services"
+    },
+    {
+      "title": "Spa and Facial Services",
+      "content": "Relax and rejuvenate with our spa services! We offer facials (classic, deep cleanse, anti-aging, hydrating), body scrubs, massages, and waxing services. Facial treatments take 45-75 minutes. We customize every treatment to your skin type and concerns. First-time facial clients receive a complimentary skin analysis.",
+      "category": "services"
+    },
+    {
+      "title": "Waxing Services",
+      "content": "We offer full body waxing services using gentle, premium wax that minimizes discomfort. Services include eyebrow shaping, lip, chin, underarms, arms, legs, bikini, and Brazilian waxing. For best results, hair should be about 1/4 inch long. Avoid sun exposure and hot showers immediately after waxing.",
+      "category": "services"
+    },
+    {
+      "title": "Booking an Appointment",
+      "content": "I'd love to help you book an appointment! Could you tell me your name, the service you're interested in, which stylist you prefer (or no preference), and your ideal date and time? We'll find the perfect slot for you! For color or complex services, we may need a bit more time blocked out.",
+      "category": "booking"
+    },
+    {
+      "title": "Pricing Information",
+      "content": "Our pricing varies by service and stylist level. I can give you a general idea of our pricing, but the best way to get an exact quote is during a consultation, especially for color services where pricing depends on hair length and the technique used. We're competitive and believe in transparent pricing — no surprises!",
+      "category": "pricing"
+    },
+    {
+      "title": "Loyalty Program and Special Offers",
+      "content": "We love rewarding our regulars! Ask about our loyalty program where you earn points with every visit that can be redeemed for free services or products. We also run monthly specials and seasonal promotions. Follow us on social media to stay updated on our latest deals and offers!",
+      "category": "FAQ"
+    }
+  ]
+}

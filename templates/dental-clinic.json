@@ -1,0 +1,86 @@
+{
+  "template": "dental-clinic",
+  "name": "Dental Clinic",
+  "description": "Pre-built knowledge base for dental clinics and dental offices",
+  "defaults": {
+    "greeting_message": "Thank you for calling our dental office! How can I help you today?",
+    "ai_personality": "professional, reassuring, warm, and empathetic — many callers may be nervous about dental visits, so be extra reassuring"
+  },
+  "entries": [
+    {
+      "title": "First Visit - What to Expect",
+      "content": "For your first visit, please arrive 15 minutes early to fill out new patient paperwork. Bring your insurance card, a photo ID, and a list of any medications you're currently taking. The first visit typically includes a comprehensive exam, X-rays, and a professional cleaning. The appointment usually lasts about 60-90 minutes.",
+      "category": "FAQ"
+    },
+    {
+      "title": "Insurance and Payment",
+      "content": "We accept most major dental insurance plans. We also offer flexible payment plans for treatments not fully covered by insurance. For patients without insurance, we offer a discount dental membership plan that includes two cleanings per year, X-rays, and discounts on treatments. We accept cash, credit cards, and debit cards.",
+      "category": "FAQ"
+    },
+    {
+      "title": "Emergency Dental Care",
+      "content": "If you're experiencing a dental emergency such as severe toothache, knocked-out tooth, broken tooth, or swelling, please call us immediately. We reserve time slots for emergency patients and will try to see you the same day. If it's after hours, follow the prompts for our emergency line.",
+      "category": "FAQ"
+    },
+    {
+      "title": "Appointment Cancellation Policy",
+      "content": "We kindly ask for at least 24 hours notice if you need to cancel or reschedule your appointment. This allows us to offer the time slot to another patient. Late cancellations or no-shows may be subject to a fee. We understand emergencies happen and will always work with you.",
+      "category": "FAQ"
+    },
+    {
+      "title": "Pain and Anxiety Management",
+      "content": "We understand dental anxiety is common and we take it very seriously. We offer various comfort options including numbing gel before injections, nitrous oxide (laughing gas), and sedation dentistry for more complex procedures. Please let us know about any anxieties and we'll make sure you're comfortable throughout your visit.",
+      "category": "FAQ"
+    },
+    {
+      "title": "Teeth Cleaning",
+      "content": "Professional teeth cleaning (prophylaxis) removes plaque and tartar buildup that regular brushing can't reach. We recommend cleanings every 6 months. The procedure is gentle and typically takes 30-45 minutes. It includes scaling, polishing, and flossing. Regular cleanings help prevent cavities, gum disease, and bad breath.",
+      "category": "services"
+    },
+    {
+      "title": "Teeth Whitening",
+      "content": "We offer both in-office and take-home teeth whitening options. In-office whitening takes about 60-90 minutes and can brighten teeth up to 8 shades. Take-home kits include custom-fitted trays and professional-grade gel for gradual whitening over 1-2 weeks. Results typically last 6 months to 2 years depending on habits.",
+      "category": "services"
+    },
+    {
+      "title": "Dental Fillings",
+      "content": "We use tooth-colored composite fillings that blend naturally with your teeth. The procedure typically takes 30-60 minutes per tooth. We numb the area first so you won't feel any pain during the procedure. After the filling, you can eat and drink normally once the numbness wears off.",
+      "category": "services"
+    },
+    {
+      "title": "Root Canal Treatment",
+      "content": "A root canal saves a severely infected tooth. Despite its reputation, modern root canals are no more uncomfortable than getting a filling. The procedure takes 60-90 minutes, we numb the area completely, and most patients report feeling much better afterward. A crown is usually recommended after a root canal to protect the tooth.",
+      "category": "services"
+    },
+    {
+      "title": "Dental Crowns and Bridges",
+      "content": "Dental crowns cover and protect damaged teeth, while bridges replace one or more missing teeth. We offer porcelain, ceramic, and zirconia options that match your natural teeth. The process typically requires two visits — one for preparation and impressions, and one for placement. Temporary crowns are provided between visits.",
+      "category": "services"
+    },
+    {
+      "title": "Dental Implants",
+      "content": "Dental implants are the gold standard for replacing missing teeth. An implant consists of a titanium post placed in the jawbone, topped with a natural-looking crown. The process takes 3-6 months total as the implant needs time to fuse with the bone. Implants look, feel, and function like natural teeth and can last a lifetime with proper care.",
+      "category": "services"
+    },
+    {
+      "title": "Braces and Orthodontics",
+      "content": "We offer traditional metal braces, ceramic braces, and clear aligner therapy (similar to Invisalign) for teeth straightening. Treatment duration varies from 6 months to 2 years depending on the complexity. We offer free orthodontic consultations to discuss the best option for you. Payment plans are available.",
+      "category": "services"
+    },
+    {
+      "title": "Children's Dentistry",
+      "content": "We love treating kids! We recommend bringing your child for their first dental visit by age 1 or when their first tooth appears. Our team is experienced with children and creates a fun, positive environment. We offer preventive treatments like sealants and fluoride treatments to protect young teeth.",
+      "category": "services"
+    },
+    {
+      "title": "Booking an Appointment",
+      "content": "I'd be happy to help you book an appointment! I'll need your full name, a phone number we can reach you at, the service you're interested in, and your preferred date and time. We're typically open Monday through Friday. Would you like to schedule something?",
+      "category": "booking"
+    },
+    {
+      "title": "Pricing Information",
+      "content": "Our pricing varies depending on the specific treatment and your insurance coverage. I can provide general price ranges, but for an exact quote, we recommend scheduling a consultation. Most insurance plans cover preventive care like cleanings and exams at 100%. For specific pricing questions, I can have our office manager call you back.",
+      "category": "pricing"
+    }
+  ]
+}
